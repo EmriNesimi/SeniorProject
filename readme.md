@@ -129,7 +129,8 @@ Emri Nesimi:
 Computer Science Major – NYIT
 Class of 2025
 
-If you have suggestions or improvements, feel free to fork this repo and submit a pull request.
+
+## If you have suggestions or improvements, feel free to fork this repo and submit a pull request.
 
 1. Fork the Project
 2. Create a Feature Branch (`git checkout -b feature/feature-name`)
