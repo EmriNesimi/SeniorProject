@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="#">
-    <img src="images/logo.png" alt="Logo" width="260" height="260">
+    <img src="images/logo.png" alt="Logo" width="450" height="400">
   </a>
 
   <h3 align="center">Malware Detection Web App</h3>
