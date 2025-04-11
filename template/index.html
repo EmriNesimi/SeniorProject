@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Malware Detection App</title>
+</head>
+<body>
+  <h1> Malware Detection App</h1>
+
+  <h2>Scan a Link</h2>
+  <form action="/predict/url" method="post">
+    <input type="text" name="url" placeholder="Enter URL" required>
+    <button type="submit">Scan URL</button>
+  </form>
+
+  <h2>Scan a File</h2>
+  <form action="/predict/file" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Scan File</button>
+  </form>
+</body>
+</html>
