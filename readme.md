@@ -129,6 +129,10 @@ Emri Nesimi:
 Computer Science Major – NYIT
 Class of 2025
 
+Tanat Sahta:
+Computer Science Major – NYIT
+Class of 2025
+
 
 ## If you have suggestions or improvements, feel free to fork this repo and submit a pull request.
 
@@ -145,5 +149,7 @@ Class of 2025
 ## Contact
 
 Emri Nesimi– [LinkedIn](https://www.linkedin.com/in/emri-nesimi-4740a526a/) – emrinesimi@yahoo.com
+Tanat Sahta - LinkedIn: (https://www.linkedin.com/in/tanat-sahta-83933a214/) - sahta.tanat123@gmail.com
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
