@@ -125,7 +125,7 @@ To get a local copy up and running follow these simple steps.
 
 <!-- CONTRIBUTING -->
 ## 🧑‍💻 Author(s)
-Emri Nesimi
+Emri Nesimi:
 Computer Science Major – NYIT
 Class of 2025
 
@@ -143,6 +143,6 @@ If you have suggestions or improvements, feel free to fork this repo and submit 
 <!-- CONTACT -->
 ## Contact
 
-Your Name – [LinkedIn](https://www.linkedin.com/in/emri-nesimi-4740a526a/) – emrinesimi@yahoo.com
+Emri Nesimi– [LinkedIn](https://www.linkedin.com/in/emri-nesimi-4740a526a/) – emrinesimi@yahoo.com
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
