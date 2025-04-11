@@ -60,7 +60,7 @@ A full-stack malware detection web application built for a senior project. The a
 * Flask
 * scikit-learn
 * pandas
-* HTML/CSS/JavaScript (or Streamlit frontend option)
+* HTML/CSS/JavaScript 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
