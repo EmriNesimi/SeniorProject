@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="#">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/logo.png" alt="Logo" width="260" height="260">
   </a>
 
   <h3 align="center">Malware Detection Web App</h3>
@@ -124,7 +124,10 @@ To get a local copy up and running follow these simple steps.
 
 
 <!-- CONTRIBUTING -->
-## Contributing
+## 🧑‍💻 Author(s)
+Emri Nesimi
+Computer Science Major – NYIT
+Class of 2025
 
 If you have suggestions or improvements, feel free to fork this repo and submit a pull request.
 
@@ -140,8 +143,6 @@ If you have suggestions or improvements, feel free to fork this repo and submit 
 <!-- CONTACT -->
 ## Contact
 
-Your Name – [LinkedIn](https://linkedin.com/in/yourprofile) – your.email@example.com
-
-Project Link: [https://github.com/yourusername/malware-detector-app](https://github.com/yourusername/malware-detector-app)
+Your Name – [LinkedIn](https://www.linkedin.com/in/emri-nesimi-4740a526a/) – emrinesimi@yahoo.com
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
