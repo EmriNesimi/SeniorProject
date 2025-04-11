@@ -149,6 +149,7 @@ Class of 2025
 ## Contact
 
 Emri Nesimi– [LinkedIn](https://www.linkedin.com/in/emri-nesimi-4740a526a/) – emrinesimi@yahoo.com
+<p> </p>
 Tanat Sahta - LinkedIn: (https://www.linkedin.com/in/tanat-sahta-83933a214/) - sahta.tanat123@gmail.com
 
 
