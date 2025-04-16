@@ -1,109 +1,80 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, render_template
 import pandas as pd
-import joblib
-import os
-from utils.preprocess import extract_url_features, extract_file_features
+import numpy as np
+from models.file_scaler import get_file_scaler
+from models.web_scaler import get_web_scaler
+from models.file_dt_model import get_file_dt_model
+from models.file_rf_model import get_file_rf_model
+from models.file_lr_model import get_file_lr_model
+from models.file_log_model import get_file_log_model
+from models.file_mlp_model import get_file_mlp_model
+from models.web_dt_model import get_web_dt_model
+from models.web_rf_model import get_web_rf_model
+from models.web_lr_model import get_web_lr_model
+from models.web_log_model import get_web_log_model
+from models.web_mlp_model import get_web_mlp_model
 
 app = Flask(__name__)
 
-# Load scalers
-scalers = {
-    "web": joblib.load("models/web_scaler.pkl"),
-    "file": joblib.load("models/file_scaler.pkl"),
-}
-
-# Import model functions
-from models.file_dt import predict as file_dt
-from models.file_rf import predict as file_rf
-from models.file_lr import predict as file_lr
-from models.file_log import predict as file_log
-from models.file_mlp import predict as file_mlp
-
-from models.web_dt import predict as web_dt
-from models.web_rf import predict as web_rf
-from models.web_lr import predict as web_lr
-from models.web_log import predict as web_log
-from models.web_mlp import predict as web_mlp
-
+# === Load Models ===
 file_models = {
-    "Decision Tree": file_dt,
-    "Random Forest": file_rf,
-    "Logistic Regression": file_lr,
-    "SVM": file_log,
-    "MLP": file_mlp
+    "Decision Tree": get_file_dt_model(),
+    "Random Forest": get_file_rf_model(),
+    "Linear Regression": get_file_lr_model(),
+    "Logistic Regression": get_file_log_model(),
+    "MLP Classifier": get_file_mlp_model()
 }
 
 web_models = {
-    "Decision Tree": web_dt,
-    "Random Forest": web_rf,
-    "Logistic Regression": web_lr,
-    "SVM": web_log,
-    "MLP": web_mlp
+    "Decision Tree": get_web_dt_model(),
+    "Random Forest": get_web_rf_model(),
+    "Linear Regression": get_web_lr_model(),
+    "Logistic Regression": get_web_log_model(),
+    "MLP Classifier": get_web_mlp_model()
 }
 
+# === Load Scalers ===
+file_scaler = get_file_scaler()
+web_scaler = get_web_scaler()
 
-@app.route("/")
+def predict_malware(input_data, source_type):
+    if source_type == "file":
+        models = file_models
+        scaler = file_scaler
+    elif source_type == "web":
+        models = web_models
+        scaler = web_scaler
+    else:
+        return "Unknown source type"
+
+    df = pd.DataFrame([input_data])
+    X_scaled = scaler.transform(df)
+    
+    malware_votes = 0
+    total_models = len(models)
+
+    for name, model in models.items():
+        prediction = model.predict(X_scaled)
+        if name == "Linear Regression":
+            prediction = np.round(prediction)
+        if prediction[0] == 1:
+            malware_votes += 1
+
+    confidence = (malware_votes / total_models) * 100
+    return confidence
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template("index.html")
+    prediction = None
+    if request.method == 'POST':
+        source_type = request.form['source_type']
+        features = request.form['features']
+        try:
+            input_data = eval(features)
+            prediction = predict_malware(input_data, source_type)
+        except Exception as e:
+            prediction = f"Error: {e}"
+    return render_template('index.html', prediction=prediction)
 
-
-@app.route("/predict/url", methods=["POST"])
-def predict_url():
-    url = request.form.get("url")
-    if not url:
-        return jsonify({"error": "No URL provided"}), 400
-
-    features = extract_url_features(url)
-    df = pd.DataFrame([features])
-    X = scalers["web"].transform(df)
-
-    predictions = {}
-    vote_count = 0
-
-    for name, model_func in web_models.items():
-        pred = model_func(X)
-        predictions[name] = int(pred)
-        vote_count += int(pred)
-
-    confidence = round((vote_count / 5) * 100, 2)
-    verdict = "Malware" if confidence >= 50 else "Safe"
-
-    return jsonify({
-        "input": url,
-        "predictions": predictions,
-        "confidence": confidence,
-        "verdict": verdict
-    })
-
-
-@app.route("/predict/file", methods=["POST"])
-def predict_file():
-    if "file" not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
-
-    file = request.files["file"]
-    features = extract_file_features(file)
-    df = pd.DataFrame([features])
-    X = scalers["file"].transform(df)
-
-    predictions = {}
-    vote_count = 0
-
-    for name, model_func in file_models.items():
-        pred = model_func(X)
-        predictions[name] = int(pred)
-        vote_count += int(pred)
-
-    confidence = round((vote_count / 5) * 100, 2)
-    verdict = "Malware" if confidence >= 50 else "Safe"
-
-    return jsonify({
-        "input": file.filename,
-        "predictions": predictions,
-        "confidence": confidence,
-        "verdict": verdict
-    })
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
