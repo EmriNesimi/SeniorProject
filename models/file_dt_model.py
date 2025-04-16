@@ -1,5 +1,5 @@
 # This file represents the trained dt model for file
-# Accuracy: 0.9757
+# Accuracy: 0.9764
 from sklearn.tree import DecisionTreeClassifier
 
 def get_file_dt_model():
