@@ -1,7 +1,9 @@
 body {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f5f7fa;
+  background-color: #1a0933;
+  color: white;
   margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,17 +11,32 @@ body {
 }
 
 .container {
-  background: white;
+  background: #2b1a44;
   padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   width: 90%;
-  max-width: 500px;
+  max-width: 520px;
   text-align: center;
 }
 
+.logo-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.logo-img {
+  height: 40px;
+}
+
 h1 {
-  margin-bottom: 20px;
+  font-size: 1.8em;
+  letter-spacing: 2px;
+  color: white;
+  margin: 0;
 }
 
 .section {
@@ -30,21 +47,29 @@ input[type="text"],
 input[type="file"] {
   padding: 10px;
   width: 100%;
-  max-width: 100%;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  border-radius: 6px;
+  border: 1px solid #555;
   margin-bottom: 15px;
+  background: #1a0933;
+  color: white;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 10px 25px;
   border: none;
   border-radius: 6px;
-  background-color: #3a86ff;
+  background-image: linear-gradient(90deg, #ff6a00, #ff0080);
   color: white;
+  font-weight: bold;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #265fc1;
+  filter: brightness(1.2);
+}
+
+.result-message {
+  font-weight: bold;
+  margin-top: 20px;
+  color: #32ff98;
 }
