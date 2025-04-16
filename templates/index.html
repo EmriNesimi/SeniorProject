@@ -30,10 +30,15 @@
       </form>
     </div>
 
-    <div id="result" class="result-message"></div>
+    {% if prediction %}
+    <div id="result" class="result-message">
+      {{ prediction }}
+    </div>
+    {% endif %}
 
   </div>
 
   <script src="../static/script.js"></script>
 </body>
 </html>
+
