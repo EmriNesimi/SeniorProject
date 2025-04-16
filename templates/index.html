@@ -2,21 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Malware Detection App</title>
+  <title>DEEPSCAN</title>
+  <link rel="stylesheet" href="../static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1> Malware Detection App</h1>
+  <div class="container">
 
-  <h2>Scan a Link</h2>
-  <form action="/predict/url" method="post">
-    <input type="text" name="url" placeholder="Enter URL" required>
-    <button type="submit">Scan URL</button>
-  </form>
+    <div class="logo-area">
+      <img src="../static/images/logo.png" alt="Deepscan Logo" class="logo-img">
+      <h1>DEEPSCAN</h1>
+    </div>
 
-  <h2>Scan a File</h2>
-  <form action="/predict/file" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" required>
-    <button type="submit">Scan File</button>
-  </form>
+    <div class="section">
+      <h2>Scan a Link</h2>
+      <form action="/predict/url" method="post">
+        <input type="text" name="url" placeholder="Enter URL" required>
+        <button type="submit">Scan URL</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <h2>Scan a File</h2>
+      <form action="/predict/file" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Scan File</button>
+      </form>
+    </div>
+
+    <div id="result" class="result-message"></div>
+
+  </div>
+
+  <script src="../static/script.js"></script>
 </body>
 </html>
