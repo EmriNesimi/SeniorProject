@@ -1,5 +1,5 @@
 # This file represents the trained dt model for web
-# Accuracy: 0.8911
+# Accuracy: 0.8922
 from sklearn.tree import DecisionTreeClassifier
 
 def get_web_dt_model():

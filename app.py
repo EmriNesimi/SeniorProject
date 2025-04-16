@@ -1,22 +1,51 @@
 from flask import Flask, render_template, request
-import os
 import pandas as pd
+import os
+import re
 
-from models.file_dt_model import model as file_dt
-from models.file_rf_model import model as file_rf
-from models.file_lr_model import model as file_lr
-from models.file_log_model import model as file_log
-from models.file_mlp_model import model as file_mlp
-from models.file_scaler import scaler as file_scaler
+from models.file_dt_model import get_file_dt_model
+from models.file_rf_model import get_file_rf_model
+from models.file_lr_model import get_file_lr_model
+from models.file_log_model import get_file_log_model
+from models.file_mlp_model import get_file_mlp_model
+from models.file_scaler import get_file_scaler
 
-from models.web_dt_model import model as web_dt
-from models.web_rf_model import model as web_rf
-from models.web_lr_model import model as web_lr
-from models.web_log_model import model as web_log
-from models.web_mlp_model import model as web_mlp
-from models.web_scaler import scaler as web_scaler
+from models.web_dt_model import get_web_dt_model
+from models.web_rf_model import get_web_rf_model
+from models.web_lr_model import get_web_lr_model
+from models.web_log_model import get_web_log_model
+from models.web_mlp_model import get_web_mlp_model
+from models.web_scaler import get_web_scaler
 
 app = Flask(__name__)
+
+# Load models and scalers
+file_dt = get_file_dt_model()
+file_rf = get_file_rf_model()
+file_lr = get_file_lr_model()
+file_log = get_file_log_model()
+file_mlp = get_file_mlp_model()
+file_scaler = get_file_scaler()
+
+web_dt = get_web_dt_model()
+web_rf = get_web_rf_model()
+web_lr = get_web_lr_model()
+web_log = get_web_log_model()
+web_mlp = get_web_mlp_model()
+web_scaler = get_web_scaler()
+
+# Dummy fit for web_scaler so .transform won't fail
+dummy_url_data = pd.DataFrame([{
+    'web_num_special_chars': 5,
+    'web_num_digits': 3,
+    'web_has_https': 1,
+    'web_has_ip': 0,
+    'web_subdomain_count': 2,
+    'web_num_params': 1,
+    'web_ends_with_number': 0,
+    'web_has_suspicious_words': 1
+}])
+web_scaler.fit(dummy_url_data)
 
 @app.route('/')
 def index():
@@ -31,7 +60,7 @@ def predict_file():
     df = pd.read_csv(file)
     df = df.drop(columns=['source'], errors='ignore')
     df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
-    X = file_scaler.transform(df)
+    X = file_scaler.fit_transform(df)
 
     votes = []
     for model in [file_dt, file_rf, file_lr, file_log, file_mlp]:
@@ -51,7 +80,6 @@ def predict_url():
     if not url:
         return render_template('index.html', prediction="No URL provided.")
 
-    import re
     features = {
         'web_num_special_chars': len(re.findall(r'\W', url)),
         'web_num_digits': sum(c.isdigit() for c in url),
@@ -60,7 +88,7 @@ def predict_url():
         'web_subdomain_count': url.count('.') - 1,
         'web_num_params': url.count('='),
         'web_ends_with_number': int(url.rstrip('/').split('/')[-1].isdigit()),
-        'web_has_suspicious_words': int(any(x in url for x in ['login', 'free', 'secure', 'verify', 'bank']))
+        'web_has_suspicious_words': int(any(x in url.lower() for x in ['login', 'free', 'secure', 'verify', 'bank']))
     }
 
     df = pd.DataFrame([features])
@@ -79,3 +107,4 @@ def predict_url():
 
 if __name__ == '__main__':
     app.run(debug=True)
+

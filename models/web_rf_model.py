@@ -1,5 +1,5 @@
 # This file represents the trained rf model for web
-# Accuracy: 0.8977
+# Accuracy: 0.8964
 from sklearn.ensemble import RandomForestClassifier
 
 def get_web_rf_model():

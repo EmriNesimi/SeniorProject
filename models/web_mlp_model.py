@@ -1,5 +1,5 @@
 # This file represents the trained mlp model for web
-# Accuracy: 0.8924
+# Accuracy: 0.8932
 from sklearn.neural_network import MLPClassifier
 
 def get_web_mlp_model():

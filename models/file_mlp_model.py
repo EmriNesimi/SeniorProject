@@ -1,5 +1,5 @@
 # This file represents the trained mlp model for file
-# Accuracy: 0.9860
+# Accuracy: 0.9864
 from sklearn.neural_network import MLPClassifier
 
 def get_file_mlp_model():
