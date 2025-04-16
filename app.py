@@ -1,80 +1,81 @@
-from flask import Flask, request, render_template
+from flask import Flask, render_template, request
+import os
 import pandas as pd
-import numpy as np
-from models.file_scaler import get_file_scaler
-from models.web_scaler import get_web_scaler
-from models.file_dt_model import get_file_dt_model
-from models.file_rf_model import get_file_rf_model
-from models.file_lr_model import get_file_lr_model
-from models.file_log_model import get_file_log_model
-from models.file_mlp_model import get_file_mlp_model
-from models.web_dt_model import get_web_dt_model
-from models.web_rf_model import get_web_rf_model
-from models.web_lr_model import get_web_lr_model
-from models.web_log_model import get_web_log_model
-from models.web_mlp_model import get_web_mlp_model
+
+from models.file_dt_model import model as file_dt
+from models.file_rf_model import model as file_rf
+from models.file_lr_model import model as file_lr
+from models.file_log_model import model as file_log
+from models.file_mlp_model import model as file_mlp
+from models.file_scaler import scaler as file_scaler
+
+from models.web_dt_model import model as web_dt
+from models.web_rf_model import model as web_rf
+from models.web_lr_model import model as web_lr
+from models.web_log_model import model as web_log
+from models.web_mlp_model import model as web_mlp
+from models.web_scaler import scaler as web_scaler
 
 app = Flask(__name__)
 
-# === Load Models ===
-file_models = {
-    "Decision Tree": get_file_dt_model(),
-    "Random Forest": get_file_rf_model(),
-    "Linear Regression": get_file_lr_model(),
-    "Logistic Regression": get_file_log_model(),
-    "MLP Classifier": get_file_mlp_model()
-}
-
-web_models = {
-    "Decision Tree": get_web_dt_model(),
-    "Random Forest": get_web_rf_model(),
-    "Linear Regression": get_web_lr_model(),
-    "Logistic Regression": get_web_log_model(),
-    "MLP Classifier": get_web_mlp_model()
-}
-
-# === Load Scalers ===
-file_scaler = get_file_scaler()
-web_scaler = get_web_scaler()
-
-def predict_malware(input_data, source_type):
-    if source_type == "file":
-        models = file_models
-        scaler = file_scaler
-    elif source_type == "web":
-        models = web_models
-        scaler = web_scaler
-    else:
-        return "Unknown source type"
-
-    df = pd.DataFrame([input_data])
-    X_scaled = scaler.transform(df)
-    
-    malware_votes = 0
-    total_models = len(models)
-
-    for name, model in models.items():
-        prediction = model.predict(X_scaled)
-        if name == "Linear Regression":
-            prediction = np.round(prediction)
-        if prediction[0] == 1:
-            malware_votes += 1
-
-    confidence = (malware_votes / total_models) * 100
-    return confidence
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    prediction = None
-    if request.method == 'POST':
-        source_type = request.form['source_type']
-        features = request.form['features']
-        try:
-            input_data = eval(features)
-            prediction = predict_malware(input_data, source_type)
-        except Exception as e:
-            prediction = f"Error: {e}"
-    return render_template('index.html', prediction=prediction)
+    return render_template('index.html')
+
+@app.route('/predict/file', methods=['POST'])
+def predict_file():
+    file = request.files['file']
+    if not file:
+        return render_template('index.html', prediction="No file uploaded.")
+
+    df = pd.read_csv(file)
+    df = df.drop(columns=['source'], errors='ignore')
+    df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
+    X = file_scaler.transform(df)
+
+    votes = []
+    for model in [file_dt, file_rf, file_lr, file_log, file_mlp]:
+        prediction = model.predict(X)
+        malware_votes = sum(prediction)
+        is_malicious = malware_votes > (len(prediction) / 2)
+        votes.append(is_malicious)
+
+    malware_percent = (sum(votes) / len(votes)) * 100
+    result = f"File Malware Probability: {malware_percent:.0f}%"
+
+    return render_template('index.html', prediction=result)
+
+@app.route('/predict/url', methods=['POST'])
+def predict_url():
+    url = request.form['url']
+    if not url:
+        return render_template('index.html', prediction="No URL provided.")
+
+    import re
+    features = {
+        'web_num_special_chars': len(re.findall(r'\W', url)),
+        'web_num_digits': sum(c.isdigit() for c in url),
+        'web_has_https': int('https' in url),
+        'web_has_ip': int(bool(re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', url))),
+        'web_subdomain_count': url.count('.') - 1,
+        'web_num_params': url.count('='),
+        'web_ends_with_number': int(url.rstrip('/').split('/')[-1].isdigit()),
+        'web_has_suspicious_words': int(any(x in url for x in ['login', 'free', 'secure', 'verify', 'bank']))
+    }
+
+    df = pd.DataFrame([features])
+    X = web_scaler.transform(df)
+
+    votes = []
+    for model in [web_dt, web_rf, web_lr, web_log, web_mlp]:
+        prediction = model.predict(X)
+        is_malicious = int(prediction[0]) == 1
+        votes.append(is_malicious)
+
+    malware_percent = (sum(votes) / len(votes)) * 100
+    result = f"URL Malware Probability: {malware_percent:.0f}%"
+
+    return render_template('index.html', prediction=result)
 
 if __name__ == '__main__':
     app.run(debug=True)
