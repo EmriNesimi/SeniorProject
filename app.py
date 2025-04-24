@@ -6,18 +6,33 @@ from models.loader import load_scaler, load_model
 
 app = Flask(__name__)
 
-# Load once at startup
+# --- Legacy web features (no raw URL column) ---
+LEGACY_WEB = [
+    'web_num_special_chars',
+    'web_num_digits',
+    'web_has_https',
+    'web_has_ip',
+    'web_subdomain_count',
+    'web_num_params',
+    'web_ends_with_number',
+    'web_has_suspicious_words'
+]
+
+# --- Load scalers & models once at startup ---
 file_scaler = load_scaler('app')
-file_models = [load_model('app', k) for k in ['dt','rf','lr','log','mlp']]
+file_models = [load_model('app', key) for key in ['dt','rf','lr','log','mlp']]
 
-web_scaler  = load_scaler('web')
-web_models  = [load_model('web', k) for k in ['dt','rf','lr','log','mlp']]
+web_scaler = load_scaler('web')
+web_models  = {k: load_model('web', k) for k in ['dt','rf','lr','log','mlp']}
 
+# Ensemble / threshold settings
+threshold = 0.413
+USE_WEIGHTED_ENSEMBLE = True
+weights = {'dt':0.1,'rf':0.6,'lr':0.1,'log':0.1,'mlp':0.1}
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/predict/file', methods=['POST'])
 def predict_file():
@@ -28,24 +43,21 @@ def predict_file():
     df = pd.read_csv(uploaded)
     df = df.drop(columns=['source'], errors='ignore')
     df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
+
     X = file_scaler.transform(df)
-
-    # Probability averaging across rows and models
-    probas = [m.predict_proba(X)[:, 1] for m in file_models]
+    probas = [m.predict_proba(X)[:,1] for m in file_models]
     avg_per_row = sum(probas) / len(probas)
-    overall_proba = avg_per_row.mean()
-    percent = overall_proba * 100
-
-    return render_template('index.html', prediction=f"File Malware Probability: {percent:.1f}%")
-
+    overall = avg_per_row.mean()
+    result = f"File Malware Probability: {overall*100:.1f}%"
+    return render_template('index.html', prediction=result)
 
 @app.route('/predict/url', methods=['POST'])
 def predict_url():
-    url = request.form.get('url', '')
+    url = request.form.get('url','').strip()
     if not url:
         return render_template('index.html', prediction="No URL provided.")
 
-    features = {
+    feats = {
         'web_num_special_chars': len(re.findall(r'\W', url)),
         'web_num_digits': sum(c.isdigit() for c in url),
         'web_has_https': int('https' in url),
@@ -55,23 +67,16 @@ def predict_url():
         'web_ends_with_number': int(url.rstrip('/').split('/')[-1].isdigit()),
         'web_has_suspicious_words': int(any(w in url.lower() for w in ['login','free','secure','verify','bank']))
     }
+    df = pd.DataFrame([feats])
+    X = web_scaler.transform(df[LEGACY_WEB])
 
-    df = pd.DataFrame([features])
-    X = web_scaler.transform(df)
-
-    # Average the positive-class probabilities
-    probas = [m.predict_proba(X)[0, 1] for m in web_models]
-    avg_proba = sum(probas) / len(probas)
-
-    # Use the RF-derived optimal threshold
-    threshold = 0.413
-    label = "Malicious" if avg_proba >= threshold else "Benign"
-    percent = avg_proba * 100
-
-    result = f"URL Malware Probability: {percent:.1f}% ({label})"
+    if not USE_WEIGHTED_ENSEMBLE:
+        proba = web_models['rf'].predict_proba(X)[0,1]
+    else:
+        proba = sum(weights[k]*web_models[k].predict_proba(X)[0,1] for k in web_models)
+    label = "Malicious" if proba>=threshold else "Benign"
+    result = f"URL Malware Probability: {proba*100:.1f}% ({label})"
     return render_template('index.html', prediction=result)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
-
