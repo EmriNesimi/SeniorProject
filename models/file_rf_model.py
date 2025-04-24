@@ -1,6 +1,5 @@
-# This file represents the trained rf model for file
-# Accuracy: 0.9870
-from sklearn.ensemble import RandomForestClassifier
+from numpy import array
 
-def get_file_rf_model():
-    return RandomForestClassifier(n_estimators=100, random_state=42)
+classes_ = array([0., 1.])
+n_outputs_ = 1
+n_classes_ = 2

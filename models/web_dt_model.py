@@ -1,6 +1,5 @@
-# This file represents the trained dt model for web
-# Accuracy: 0.8922
-from sklearn.tree import DecisionTreeClassifier
+from numpy import array
 
-def get_web_dt_model():
-    return DecisionTreeClassifier(max_depth=10, random_state=42)
+classes_ = array([0., 1.])
+n_outputs_ = 1
+n_classes_ = 2

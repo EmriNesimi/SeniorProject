@@ -1,88 +1,99 @@
+import os
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression, LinearRegression
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import accuracy_score
-import os
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.model_selection import train_test_split
+import joblib
 
-# === Paths ===
-CSV_PATH = "data/combined_datasets.csv"
-WEB_SAMPLE_SIZE = 20000
+# Paths
+data_base   = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+data_path   = os.path.join(data_base, 'data', 'combined_datasets.csv')
+models_dir  = os.path.dirname(__file__)
 
-# === Load dataset ===
-df = pd.read_csv(CSV_PATH, low_memory=False)
-df["source"] = df["source"].astype(str).str.lower().str.strip()
+# Load and clean dataset
+df = pd.read_csv(data_path, low_memory=False)
+df['label'] = df['label'].replace('?', np.nan).pipe(pd.to_numeric, errors='coerce')
+df = df.dropna(subset=['label'])
+df['label'] = df['label'].astype(int)
 
-print("Original source counts:")
-print(df["source"].value_counts(dropna=False))
+# Define feature sets
+all_features = [c for c in df.columns if c not in ['label', 'source']]
+web_features = [
+    'web_num_special_chars','web_num_digits','web_has_https','web_has_ip',
+    'web_subdomain_count','web_num_params','web_ends_with_number','web_has_suspicious_words'
+]
 
-# === Split dataset ===
-df_file = df[df["source"] == "app"].copy()
-df_web = df[df["source"] == "web"].copy()
+# Clean features
+df[all_features] = df[all_features].replace('?', np.nan)
+df[all_features] = df[all_features].apply(pd.to_numeric, errors='coerce').fillna(0)
 
-# === Reduce web rows ===
-if len(df_web) > WEB_SAMPLE_SIZE:
-    df_web = df_web.sample(n=WEB_SAMPLE_SIZE, random_state=42)
-    print(f"Web reduced to {len(df_web)} rows")
+y       = df['label']
+sources = df['source'].unique().tolist()
+print("Found source labels:", sources)
 
-# === Model dictionary ===
-models = {
-    "dt": DecisionTreeClassifier(),
-    "rf": RandomForestClassifier(),
-    "lr": LinearRegression(),
-    "log": LogisticRegression(max_iter=1000),
-    "mlp": MLPClassifier(max_iter=500)
-}
+# Base classifiers
+def get_base_models():
+    return {
+        'dt': DecisionTreeClassifier(max_depth=10, random_state=42),
+        'rf': RandomForestClassifier(n_estimators=100, random_state=42),
+        'lr': LogisticRegression(solver='lbfgs', max_iter=5000, tol=1e-4, random_state=42),
+        'log': LogisticRegression(solver='saga', max_iter=5000, tol=1e-4, random_state=42),
+        'mlp': MLPClassifier(hidden_layer_sizes=(100,), max_iter=1000, tol=1e-4, early_stopping=True, random_state=42)
+    }
 
-# === Train function ===
-def train_models(df_split, prefix):
-    print(f"\nTraining models for: {prefix.upper()}")
+# Training loop
 
-    if df_split.empty:
-        print(f"⚠️ No data found for {prefix}")
-        return
+def train_all():
+    base_models = get_base_models()
 
-    df_split["label"] = pd.to_numeric(df_split["label"], errors="coerce")
-    df_split = df_split[df_split["label"].isin([0, 1])]
-    X = df_split.drop(columns=["label", "source"], errors="ignore")
-    y = df_split["label"]
-    X = X.apply(pd.to_numeric, errors="coerce").fillna(0)
+    for src in sources:
+        print(f"\n▶ Training on '{src.upper()}' subset")
+        # Select feature matrix
+        feat_cols = web_features if src == 'web' else all_features
+        X_src = df.loc[df['source'] == src, feat_cols]
+        y_src = y.loc[X_src.index]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # Down-sample web subset
+        if src == 'web' and len(X_src) > 20000:
+            X_src = X_src.sample(n=20000, random_state=42)
+            y_src = y_src.loc[X_src.index]  # re-align labels to the sampled features
+            print(f"  Down-sampled web to {len(X_src)} rows")
 
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+        # Split train/calibration folds
+        X_train, X_calib, y_train, y_calib = train_test_split(
+            X_src, y_src,
+            test_size=0.2,
+            stratify=y_src,
+            random_state=42
+        )
 
-    # Save dummy scaler file
-    scaler_path = f"models/{prefix}_scaler.py"
-    with open(scaler_path, "w") as f:
-        f.write("# This file represents the trained StandardScaler for {}\n".format(prefix))
+        # Scale
+        scaler = StandardScaler().fit(X_train)
+        X_train_s = scaler.transform(X_train)
+        X_calib_s = scaler.transform(X_calib)
 
-    # Train each model
-    for name, model in models.items():
-        try:
-            model.fit(X_train_scaled, y_train)
-            y_pred = model.predict(X_test_scaled)
+        # Save scaler
+        scaler_file = os.path.join(models_dir, f"{src}_scaler.joblib")
+        joblib.dump(scaler, scaler_file)
+        print(f"  Saved scaler: {os.path.basename(scaler_file)}")
 
-            if name == "lr":
-                y_pred = np.rint(y_pred)
+        # Train + calibrate models
+        for key, base in base_models.items():
+            print(f"  Training & calibrating '{key}'...")
+            base.fit(X_train_s, y_train)
+            calib = CalibratedClassifierCV(base, method='sigmoid', cv='prefit')
+            calib.fit(X_calib_s, y_calib)
 
-            acc = accuracy_score(y_test, y_pred)
-            print(f"{prefix}_{name} accuracy: {acc:.4f}")
+            model_file = os.path.join(models_dir, f"{src}_{key}.joblib")
+            joblib.dump(calib, model_file)
+            print(f"    Saved calibrated model: {os.path.basename(model_file)}")
 
-            model_path = f"models/{prefix}_{name}_model.py"
-            with open(model_path, "w") as f:
-                f.write(f"# This file represents the trained {name} model for {prefix}\n")
-                f.write(f"# Accuracy: {acc:.4f}\n")
+    print("\nTraining complete.")
 
-        except Exception as e:
-            print(f"Error training {prefix}_{name}: {e}")
-
-# === Execute training ===
-train_models(df_file, "file")
-train_models(df_web, "web")
+if __name__ == '__main__':
+    train_all()
