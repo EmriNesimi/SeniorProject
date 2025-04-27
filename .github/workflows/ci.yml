@@ -1,0 +1,53 @@
+# .github/workflows/ci.yml
+name: Continuous Integration
+
+# Trigger this workflow on pushes *and* PRs to master
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    # The VM runner
+    runs-on: ubuntu-latest
+
+    # Inject the secret into the job’s ENV
+    env:
+      # This pulls from the UI-secret you added earlier
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+
+    steps:
+      # 1) Check out your code so the runner has access to it
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2) Set up Python (match your local version, e.g. 3.12)
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # 3) Install your dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4) Sanity check that the secret is actually there
+      #    → It will echo “Key is: ***” but GitHub will mask it as *****
+      - name: Smoke-test env var
+        run: |
+          python - <<EOF
+          import os
+          key = os.getenv("GOOGLE_API_KEY")
+          if not key:
+              raise RuntimeError("Missing key!")
+          print("Got key length:", len(key))
+          EOF
+
+      # 5) Run your tests (or training, linting, etc.)
+      - name: Run tests
+        run: |
+          pytest  # or your flask-specific checks, e.g. `python -m unittest`
