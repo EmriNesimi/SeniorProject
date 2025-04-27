@@ -10,35 +10,55 @@
   <div class="container">
 
     <div class="logo-area">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Deepscan Logo" class="logo-img">
+      <img src="{{ url_for('static', filename='images/logo.png') }}"
+           alt="Deepscan Logo"
+           class="logo-img">
       <h1>DEEPSCAN</h1>
     </div>
 
+    <!-- URL scanning form -->
     <div class="section">
       <h2>Scan a Link</h2>
       <form action="/predict/url" method="post">
-        <input type="text" name="url" placeholder="Enter URL" required>
+        <input type="text"
+               name="url"
+               placeholder="Enter URL (include http:// or https://)"
+               required>
         <button type="submit">Scan URL</button>
       </form>
+      {% if url_error %}
+        <p class="error">{{ url_error }}</p>
+      {% endif %}
+      {% if input_url and predicted_class %}
+        <div class="result">
+          <p><strong>URL:</strong> {{ input_url }}</p>
+          <p><strong>Classification:</strong> {{ predicted_class }}</p>
+        </div>
+      {% endif %}
     </div>
 
+    <!-- File scanning form -->
     <div class="section">
       <h2>Scan a File</h2>
-      <form action="/predict/file" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" required>
+      <form action="/predict/file"
+            method="post"
+            enctype="multipart/form-data">
+        <input type="file"
+               name="file"
+               accept=".apk,.pdf,.txt"
+               required>
         <button type="submit">Scan File</button>
       </form>
+      {% if file_error %}
+        <p class="error">{{ file_error }}</p>
+      {% endif %}
+      {% if file_result %}
+        <div class="result">
+          <p><strong>File scan result:</strong> {{ file_result }}</p>
+        </div>
+      {% endif %}
     </div>
-
-    {% if prediction %}
-    <div id="result" class="result-message">
-      {{ prediction }}
-    </div>
-    {% endif %}
 
   </div>
 </body>
 </html>
-
-
-
