@@ -29,18 +29,24 @@ body {
 }
 
 .logo-img {
-  height: 40px;
+  height: 100px;
 }
 
-h1 {
-  font-size: 1.8em;
-  letter-spacing: 2px;
+.logo-area h1 {
+  font-size: 1.4em;
+  letter-spacing: 1px;
   color: white;
   margin: 0;
 }
 
 .section {
   margin-bottom: 30px;
+}
+
+.section h2 {
+  font-size: 1.8em;
+  letter-spacing: 2px;
+  margin: 0 0 15px;
 }
 
 input[type="text"],
@@ -72,4 +78,10 @@ button:hover {
   font-weight: bold;
   margin-top: 20px;
   color: #32ff98;
+}
+
+.error {
+  color: #ff4d4f;
+  margin-top: 10px;
+  font-size: 0.9em;
 }
