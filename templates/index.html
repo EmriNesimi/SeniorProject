@@ -7,44 +7,25 @@
 </head>
 <body>
   <div class="container">
-
-    <!-- Logo + Title -->
     <div class="logo-area">
-      <!-- this image tag was missing -->
-      <img src="{{ url_for('static', filename='images/logo.png') }}"
-           alt="Deepscan Logo"
-           class="logo-img">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo-img" alt="Logo">
       <h1>DEEPSCAN</h1>
     </div>
-
-    <!-- URL scanner form -->
     <div class="section">
       <h2>Scan a Link</h2>
       <form action="{{ url_for('predict_url') }}" method="post">
-        <input type="text"
-               name="url"
-               placeholder="Enter URL (with or without http://)"
-               required>
+        <input type="text" name="url" placeholder="Enter URL (with or without http://)" required>
         <button type="submit">Scan URL</button>
       </form>
     </div>
-
-    <!-- File scanner form -->
     <div class="section">
       <h2>Scan a File</h2>
-      <form action="{{ url_for('predict_file') }}"
-            method="post"
-            enctype="multipart/form-data">
-        <input type="file"
-               name="file"
-               accept=".pdf,.txt,.apk"
-               required>
+      <form action="{{ url_for('predict_file') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".apk,.pdf,.txt" required>
         <button type="submit">Scan File</button>
       </form>
     </div>
-
   </div>
 </body>
 </html>
-
 
