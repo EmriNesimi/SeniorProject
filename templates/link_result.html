@@ -8,15 +8,9 @@
 <body>
   <div class="container">
     <h1>Link Scan Result</h1>
-    <p><strong>URL:</strong> {{ input_url }}</p>
-    <p><strong>Classification:</strong> {{ prediction }}</p>
-    <a href="/">Back to Home</a>
+    <p><strong>URL:</strong> {{ url }}</p>
+    <p><strong>Result:</strong> {{ result_msg }}</p>
+    <a href="{{ back_url }}" class="back-link">Back to Home</a>
   </div>
 </body>
 </html>
-
-
-
-
-
-
