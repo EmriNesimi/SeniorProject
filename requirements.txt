@@ -2,4 +2,5 @@ flask
 joblib
 pandas
 scikit-learn
+pytest
 
