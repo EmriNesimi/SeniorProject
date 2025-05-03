@@ -20,8 +20,6 @@ from sklearn.model_selection import train_test_split
 
 import joblib
 
-# ——— Helpers —————————————————————————————————————————————————————————
-
 def get_domain_age_days(url: str) -> float:
     """Return domain age in days since WHOIS creation_date, or 0 if unavailable."""
     ext = tldextract.extract(url)
@@ -37,13 +35,9 @@ def get_domain_age_days(url: str) -> float:
     except Exception:
         return 0.0
 
-# ——— Paths ——————————————————————————————————————————————————————————
-
 base_dir   = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 data_path  = os.path.join(base_dir, 'data', 'combined_datasets.csv')
 models_dir = os.path.dirname(__file__)
-
-# ——— Load & clean dataset ——————————————————————————————————————————————
 
 print(f"Loading data from {data_path}...")
 df = pd.read_csv(data_path, low_memory=False)
@@ -54,7 +48,6 @@ df['label'] = pd.to_numeric(df['label'], errors='coerce')
 df = df.dropna(subset=['label'])
 df['label'] = df['label'].astype(int)
 
-# ——— Compute domain-age feature —————————————————————————————————————————
 
 if 'url' in df.columns:
     print("URL column found — extracting domain-age feature…")
@@ -85,13 +78,10 @@ if missing:
 
 print(f"Using {len(file_features)} file features and {len(web_features)} web features.")
 
-# ——— Coerce to numeric ————————————————————————————————————————————————
-
 print("Converting feature columns to numeric & filling NaNs…")
 df[file_features] = df[file_features].apply(pd.to_numeric, errors='coerce').fillna(0)
 df[web_features]  = df[web_features].apply(pd.to_numeric, errors='coerce').fillna(0)
 
-# ——— Labels & source split ——————————————————————————————————————————————
 
 y       = df['label']
 sources = df['source'].unique().tolist()
