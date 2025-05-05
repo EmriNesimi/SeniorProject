@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="homepage">
   <div class="page-wrapper">
     <div class="hero">
       <div class="intro">
@@ -14,8 +14,6 @@
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="DEEPSCAN logo" class="logo">
         <p>Scan a link or file to check if it’s safe</p>
       </div>
-      
-      
 
       <div class="scan-section">
         <div class="scan-card">
@@ -24,7 +22,7 @@
             <input type="text" name="url" placeholder="Enter URL (with or without https)" required>
             <button type="submit">Scan Now</button>
           </form>
-          <a href="/learn/links" class="info-link">What makes a link dangerous?</a>
+          <a href="javascript:void(0)" onclick="openModal('linkModal')" class="info-link">What makes a link dangerous?</a>
         </div>
 
         <div class="scan-card">
@@ -33,10 +31,49 @@
             <input type="file" name="file" required>
             <button type="submit">Scan File</button>
           </form>
-          <a href="/learn/files" class="info-link">What types of files are suspicious?</a>
+          <a href="javascript:void(0)" onclick="openModal('fileModal')" class="info-link">What types of files are suspicious?</a>
         </div>
       </div>
     </div>
   </div>
+
+
+  <!-- Link Modal -->
+<div id="linkModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('linkModal')">&times;</span>
+    <img src="{{ url_for('static', filename='images/link-danger.png') }}" alt="Dangerous Link" class="modal-image">
+    <h2>What Makes a Link Dangerous?</h2>
+    <p>Dangerous links may lead to phishing websites, download malware, or steal personal information. Always check the URL source and avoid clicking unknown shortened links.</p>
+  </div>
+</div>
+
+<!-- File Modal -->
+<div id="fileModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('fileModal')">&times;</span>
+    <img src="{{ url_for('static', filename='images/file-danger.png') }}" alt="Suspicious File" class="modal-image">
+    <h2>What Types of Files Are Suspicious?</h2>
+    <p>Executable files (.exe, .bat), unknown scripts, or even PDFs with embedded code can contain malware. Avoid downloading from untrusted sources and scan all files before opening.</p>
+  </div>
+</div>
+
+
+  
+  <script>
+    function openModal(id) {
+      document.getElementById(id).style.display = 'block';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = "none";
+      }
+    }
+  </script>
 </body>
 </html>
