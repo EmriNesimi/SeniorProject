@@ -4,23 +4,28 @@
   <meta charset="UTF-8">
   <title>Link Scan Result</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
+  <body class="result-body">
   <canvas id="matrix"></canvas>
-  <div class="container result-card {{ flag }}">
-    <h1 class="{{ 'glitch' if flag=='harmful' else '' }}">Link Scan Result</h1>
-    <p><strong>URL:</strong> {{ input_url }}</p>
-    <p>
-      <strong>Result:</strong>
-      <span class="{{ flag }}">
-        {% if flag=='safe' %}✅ Safe{% else %}❌ Harmful{% endif %}
-      </span>
-      — {{ detail }}
-    </p>
-    <a href="{{ url_for('home') }}" class="back-link">Back to Home</a>
+  <div class="page-wrapper">
+    <div class="result-card {{ flag }}">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="DEEPSCAN logo" class="logo">
+      <h1 class="{% if flag=='harmful' %}glitch{% endif %}">Link Scan Result</h1>
+      <p><strong>URL:</strong> {{ input_url }}</p>
+      <p><strong>Result:</strong>
+        <span class="{{ flag }}">
+          {% if flag=='safe' %}✅ Safe{% else %}❌ Harmful{% endif %}
+        </span>
+        — {{ detail }}
+      </p>
+      <a href="{{ url_for('home') }}" class="button-link">Back to Home</a>
+    </div>
   </div>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
+
 
 

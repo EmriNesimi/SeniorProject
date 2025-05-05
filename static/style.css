@@ -1,118 +1,246 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #1a0933;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
-  background: #1a0933;
-  color: #fff;
-  overflow: hidden;
 }
 
-.container {
-  background: #2b1a44;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-  padding: 30px 40px;
-  width: 90%;
-  max-width: 520px;
+.page-wrapper {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+  flex-wrap: wrap;
+  padding: 40px 20px;
+}
+
+.intro {
   text-align: center;
+  max-width: 500px;
+  flex: 1;
+}
+
+.intro h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.intro p {
+  font-size: 1.1em;
+  color: #ccc;
+}
+
+.scan-section {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.scan-card {
+  background-color: #2b1a44;
+  padding: 30px;
+  border-radius: 12px;
+  width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scan-card h2 {
+  margin-bottom: 15px;
+  color: white;
+  text-align: center;
+}
+
+.scan-card form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.scan-card form input[type="text"],
+.scan-card form input[type="file"],
+.scan-card form button {
+  width: 80%;
+  max-width: 240px;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background-color: #1a0933;
+  color: white;
+  text-align: center;
+}
+
+.scan-card form button {
+  background-image: linear-gradient(90deg, #ff6a00, #ff0080);
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.scan-card form button:hover {
+  filter: brightness(1.15);
+}
+
+.info-link {
+  display: block;
+  margin-top: 10px;
+  color: #7cbfff;
+  font-size: 0.9em;
+  text-align: center;
+  text-decoration: none;
+  width: 100%;canvas#matrix {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0;
+  pointer-events: none;
+}
+}
+
+.info-link:hover {
+  text-decoration: underline;
+}
+
+.logo {
+  width: 240px;
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+
+.result-card {
+  background-color: #2b1a44;
+  padding: 30px 40px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   position: relative;
   z-index: 2;
 }
 
-.logo-area {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 25px;
-}
-.logo-img {
-  height: 100px;
-  width: auto;
-}
-h1 {
-  font-size: 1.8rem;
-  letter-spacing: 2px;
+.result-card.safe {
+  border: 2px solid #00ffa3;
 }
 
-.section {
-  margin-bottom: 30px;
+.result-card.harmful {
+  border: 2px solid #ff003c;
 }
-input[type="text"],
-input[type="file"] {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #555;
-  border-radius: 6px;
-  background: #1a0933;
-  color: #fff;
-}
-button {
-  padding: 10px 25px;
-  border: none;
-  border-radius: 6px;
-  background-image: linear-gradient(90deg, #ff6a00, #ff0080);
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-}
-button:hover { filter: brightness(1.2); }
 
-.result-card {
-  border: 3px solid transparent;
-  margin-top: 20px;
-  padding-top: 20px;
+.result-card h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8em;
+  margin: 20px 0;
 }
-.result-card.safe { border-color: #32ff98; }
-.result-card.harmful { border-color: #ff3258; }
 
 .result-card p {
-  margin: 15px 0;
-  font-size: 1.1rem;
+  font-size: 1em;
+  margin: 10px 0;
 }
 
-.safe { color: #32ff98; }
-.harmful { color: #ff3258; }
-
-.back-link {
-  display: inline-block;
-  margin-top: 20px;
-  color: #fff !important;
-  text-decoration: none;
-  font-weight: bold;
-}
-.back-link:hover { text-decoration: underline; }
-
-@keyframes glitchAnim {
-  0%  { transform: translate(0) skew(0.5deg); }
-  20% { transform: translate(-2px,2px) skew(1deg); }
-  40% { transform: translate(2px,-1px) skew(0.3deg); }
-  60% { transform: translate(-1px,1px) skew(0.7deg); }
-  80% { transform: translate(1px,-2px) skew(0.4deg); }
- 100% { transform: translate(0) skew(0.5deg); }
-}
-.glitch {
-  animation: glitchAnim 0.3s infinite;
-  text-shadow: -2px 0 #0f0, 2px 0 #00f;
+.result-card .logo {
+  width: 100px;
+  margin-bottom: 10px;
 }
 
-#matrix {
+canvas#matrix {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  z-index: 1;
-  display: none;
-}
-body.hacked #matrix { display: block; }
-
-#confetti-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0;
   pointer-events: none;
-  z-index: 3;
 }
+
+.button-link {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 10px 20px;
+  background-image: linear-gradient(90deg, #ff6a00, #ff0080);
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: filter 0.2s ease;
+}
+
+.button-link:hover {
+  filter: brightness(1.15);
+}
+
+.glitch {
+  animation: glitch 1s infinite;
+}
+
+@keyframes glitch {
+  0%   { text-shadow: 2px 2px red; }
+  50%  { text-shadow: -2px -2px cyan; }
+  100% { text-shadow: 2px 2px red; }
+}
+
+body.result-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #1a0933;
+}
+
+.page-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.result-body .page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+canvas#matrix,
+canvas#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.homepage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; 
+}
+
