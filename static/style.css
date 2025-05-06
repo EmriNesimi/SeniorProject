@@ -13,12 +13,15 @@ body {
 }
 
 .page-wrapper {
-  max-width: 1400px;
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  height: 100vh;           
   width: 100%;
-  margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
 }
+
 
 .hero {
   display: flex;
@@ -52,7 +55,97 @@ body {
   gap: 30px;
   flex-wrap: wrap;
   justify-content: center;
-  margin-left: 150px;
+}
+
+@media (max-width: 1200px) {
+  .hero {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+    gap: 20px;
+  }
+
+  .intro h1 {
+    font-size: 3.2em;
+    margin-bottom: 4px;
+  }
+
+  .intro .logo {
+    max-width: 380px;
+    margin-bottom: 6px;
+  }
+
+  .intro p {
+    margin: 4px 0;
+    font-size: 1.05em;
+  }
+
+  .scan-section {
+    margin-top: 10px;
+    gap: 20px;
+  }
+
+  .scan-card {
+    padding: 25px;
+    max-width: 350px;
+  }
+}
+
+@media (max-width: 800px) {
+  .hero {
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 10px;
+    gap: 12px;
+  }
+
+  .intro h1 {
+    font-size: 2em;
+  }
+
+  .intro .logo {
+    max-width: 160px;
+    max-height: 120px;
+    margin: 4px 0;
+  }
+
+  .intro p {
+    font-size: 0.85em;
+    margin: 4px 0 10px;
+  }
+
+  .scan-section {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .scan-card {
+    width: 90%;
+    max-width: 260px;
+    padding: 8px;
+    margin: 0 auto;
+  }
+
+  .scan-card h2 {
+    font-size: 1.1em;
+    margin-bottom: 6px;
+  }
+
+  .scan-card form input,
+  .scan-card form button {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 6px;
+    font-size: 0.85em;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 320px;
+    padding: 15px;
+  }
 }
 
 .scan-card {
@@ -242,7 +335,7 @@ body.homepage {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; 
+  padding: 20px 0;   
 }
 
 .modal {
