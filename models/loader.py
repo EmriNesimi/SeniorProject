@@ -1,5 +1,3 @@
-# models/loader.py
-
 import os
 import joblib
 

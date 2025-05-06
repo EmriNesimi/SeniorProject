@@ -51,15 +51,13 @@ def get_domain_age_days(url: str) -> float:
     if not domain:
         return 0.0
 
-    # Return cached if present
     if domain in _domain_age_cache:
         return _domain_age_cache[domain]
 
-    # Otherwise, attempt WHOIS lookup
     try:
         w  = whois.whois(domain, timeout=5)
         cd = w.creation_date
-        # sometimes a list
+
         if isinstance(cd, list):
             cd = cd[0]
         if isinstance(cd, datetime):
@@ -69,7 +67,6 @@ def get_domain_age_days(url: str) -> float:
     except Exception:
         age = 0.0
 
-    # Cache and return
     _domain_age_cache[domain] = float(age)
     return age
 
@@ -81,7 +78,6 @@ df = pd.read_csv(CSV_PATH)
 if 'url' not in df.columns or 'type' not in df.columns:
     raise KeyError("links.csv must contain 'url' and 'type' columns")
 
-# Map all non‐benign types to 1 (malicious), benign→0
 df['label'] = (df['type'].str.lower() != 'benign').astype(int)
 
 # ─── Feature engineering ──────────────────────────────────────────────────────
@@ -103,10 +99,7 @@ df['web_has_suspicious_words'] = df['url'].str.contains(
 print("Computing domain ages (cached WHOIS)…")
 df['web_domain_age_days'] = df['url'].apply(get_domain_age_days)
 
-# Persist cache so subsequent runs use stored values
 _save_cache()
-
-# ─── Prepare arrays for training ──────────────────────────────────────────────
 
 FEATURES = [
     'web_num_special_chars',
@@ -151,5 +144,5 @@ calib.fit(X_calib_s, y_calib)
 joblib.dump(calib, os.path.join(MODELS_DIR, 'web_rf.joblib'))
 print("Saved web_rf.joblib")
 
-print("✅ Web model training complete!")
+print("Web model training complete!")
 

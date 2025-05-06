@@ -56,7 +56,6 @@ else:
     print("No URL column — defaulting domain-age to 0 for all rows")
     df['web_domain_age_days'] = 0.0
 
-# ——— Define feature sets ——————————————————————————————————————————————
 
 print("Defining feature sets…")
 file_features = [c for c in df.columns if c.startswith('drebin_')]
@@ -103,20 +102,17 @@ def train_all():
     for src in sources:
         print(f"\n▶ Training on '{src.upper()}' subset…")
 
-        # Select correct feature matrix
         if src == 'web':
             X_src = df.loc[df['source'] == src, web_features]
         else:
             X_src = df.loc[df['source'] == src, file_features]
         y_src = y.loc[X_src.index]
 
-        # Down-sample web if too large
         if src == 'web' and len(X_src) > 20000:
             X_src = X_src.sample(n=20000, random_state=42)
             y_src = y_src.loc[X_src.index]
             print(f"  Down-sampled web to {len(X_src)} rows")
 
-        # Split into train / calibration
         X_train, X_calib, y_train, y_calib = train_test_split(
             X_src, y_src, test_size=0.2, stratify=y_src, random_state=42
         )
@@ -126,7 +122,6 @@ def train_all():
         X_train_s = scaler.transform(X_train)
         X_calib_s = scaler.transform(X_calib)
 
-        # Save scaler
         scaler_path = os.path.join(models_dir, f"{src}_scaler.joblib")
         joblib.dump(scaler, scaler_path)
         print(f"  Saved scaler: {os.path.basename(scaler_path)}")

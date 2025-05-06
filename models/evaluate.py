@@ -5,11 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, roc_auc_score, roc_curve
 
-# Ensure we can import loader.py from models/
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from loader import load_scaler, load_model
 
-# Define feature sets
 WEB_FEATURES = [
     'web_num_special_chars',
     'web_num_digits',
@@ -20,10 +18,6 @@ WEB_FEATURES = [
     'web_ends_with_number',
     'web_has_suspicious_words'
 ]
-
-# If you want to evaluate file-based models, define ALL_FEATURES similarly:
-# ALL_FEATURES = [...]  # replace with your full feature list
-
 
 def load_and_clean_data(data_path):
     """
@@ -50,7 +44,6 @@ def evaluate_source(src, df, feat_cols, threshold=0.5, plot_roc=False):
     X = sub[feat_cols]
     y = sub['label']
 
-    # Load scaler and models
     scaler = load_scaler(src)
     Xs = scaler.transform(X)
 
@@ -75,7 +68,6 @@ def evaluate_source(src, df, feat_cols, threshold=0.5, plot_roc=False):
 
     print(f"\nBest model: {best_key} with ROC AUC = {best_auc:.4f}")
 
-    # Compute optimal threshold via Youden's J
     fpr, tpr, thresholds = roc_curve(y, best_probas)
     j_scores = tpr - fpr
     j_idx = np.argmax(j_scores)
@@ -94,10 +86,7 @@ def evaluate_source(src, df, feat_cols, threshold=0.5, plot_roc=False):
 
 
 if __name__ == '__main__':
-    # Determine paths
     data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'combined_datasets.csv'))
-# Load and clean data
 utils_df = load_and_clean_data(data_path)
 
-# Evaluate web models
 evaluate_source('web', utils_df, WEB_FEATURES, threshold=0.5, plot_roc=True)
