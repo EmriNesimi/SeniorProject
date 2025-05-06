@@ -142,10 +142,10 @@ body {
   }
 
   .modal-content {
-    width: 95%;
-    max-width: 320px;
-    padding: 15px;
+    width: 75%;
+    max-width: 100px;
   }
+
 }
 
 .scan-card {
