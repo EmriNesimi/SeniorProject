@@ -1,6 +1,19 @@
+# --- Web app (app.py) ---
 flask
-joblib
-pandas
-scikit-learn
-pytest
+google-generativeai
+python-dotenv
+PyPDF2
 
+# --- Model evaluation (inspect_1.py, utils/preprocess.py) ---
+pandas
+numpy
+joblib
+scikit-learn
+tldextract
+python-whois
+
+# --- Test fixture generation (generate_eicar_pdf.py) ---
+reportlab
+
+# --- Testing ---
+pytest
