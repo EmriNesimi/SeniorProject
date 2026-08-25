@@ -1,1 +1,28 @@
-!data/.gitkeep.env
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- Virtual environments ---
+venv/
+.venv/
+env/
+
+# --- Generated test fixtures ---
+eicar.txt
+eicar.pdf
+
+# --- Data (keep the directory, ignore its contents) ---
+data/*
+!data/.gitkeep
+
+# --- OS / editor ---
+.DS_Store
+.idea/
+.vscode/
